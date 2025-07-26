@@ -16,7 +16,9 @@
   -moz-osx-font-smoothing: grayscale;
 
   --yarl__color_button: #9f9f9f;
-  --yarl__color_button_active: #000
+  --yarl__color_button_active: #000;
+
+  --dialog-base-margin: 1rem;
 }
 
 body {
@@ -30,4 +32,8 @@ body {
   width: 1.5rem;
   height: 1.5rem;
   color: #fff;
+}
+
+.chakra-dialog__content {
+  margin-top: 150px !important;
 }

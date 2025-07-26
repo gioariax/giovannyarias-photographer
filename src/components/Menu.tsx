@@ -2,7 +2,9 @@ import { MenuIcon } from 'lucide-react';
 import React from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { Button } from "@chakra-ui/react"
+import { Button, CloseButton, Portal } from "@chakra-ui/react"
+import { Dialog } from "@chakra-ui/react"
+import ContactForm from './ContactForm';
 
 const MenuContainer = styled.nav`
   display: flex;
@@ -28,16 +30,15 @@ const MenuButton = styled.button`
   }
 `;
 
-
-
 const Menu: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [size, setSize] = React.useState<'sm' | 'md' | 'lg'>('md');
   const links = [
     { to: '/', label: 'My Work' },
     { to: '/about-me', label: 'About Me' },
-    { to: '/contact', label: 'Contact' },
   ];
+  const [open, setOpen] = React.useState(false);
   return (
     <>
       <MenuContainer>
@@ -53,6 +54,34 @@ const Menu: React.FC = () => {
             {link.label}
           </Button>
         ))}
+        <Dialog.Root
+          open={open}
+          onOpenChange={(details) => setOpen(details.open)}
+          key={size}
+          size={size}
+        >
+          <Dialog.Trigger asChild>
+            <Button size="sm" variant={'ghost'} onClick={() => setOpen(true)}>
+              Contact
+            </Button>
+          </Dialog.Trigger>
+          <Portal>
+            <Dialog.Backdrop />
+            <Dialog.Positioner>
+              <Dialog.Content>
+                <Dialog.Header>
+                  <Dialog.Title>Contact me!</Dialog.Title>
+                </Dialog.Header>
+                <Dialog.Body>
+                  <ContactForm onCancel={() => setOpen(false)} />
+                  <Dialog.CloseTrigger asChild>
+                    <CloseButton size="sm" />
+                  </Dialog.CloseTrigger>
+                </Dialog.Body>
+              </Dialog.Content>
+            </Dialog.Positioner>
+          </Portal>
+        </Dialog.Root>
       </MenuContainer>
       <MenuButton>
         <MenuIcon />
