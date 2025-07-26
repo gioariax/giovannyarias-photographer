@@ -4,17 +4,20 @@ import MyWork from './pages/MyWork';
 import AboutMe from './pages/AboutMe';
 import Contact from './pages/Contact';
 import Layout from './components/Layout';
+import { LightMode } from "@/components/ui/color-mode"
 
 function App() {
   return (
     <Router>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<MyWork />} />
-          <Route path="/about-me" element={<AboutMe />} />
-          <Route path="/contact" element={<Contact />} />
-        </Routes>
-      </Layout>
+      <LightMode>
+        <Layout>
+          <Routes>
+            <Route path="/" element={<MyWork />} />
+            <Route path="/about-me" element={<AboutMe />} />
+            <Route path="/contact" element={<Contact />} />
+          </Routes>
+        </Layout>
+      </LightMode>
     </Router>
   );
 }

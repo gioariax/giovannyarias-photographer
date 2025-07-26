@@ -1,7 +1,8 @@
 import { MenuIcon } from 'lucide-react';
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import { Button } from "@chakra-ui/react"
 
 const MenuContainer = styled.nav`
   display: flex;
@@ -27,30 +28,37 @@ const MenuButton = styled.button`
   }
 `;
 
-const StyledLink = styled(NavLink)`
-  color: #222;
-  text-decoration: none;
-  font-weight: 500;
-  font-size: 1rem;
-  padding: 6px 16px;
-  border-radius: 20px;
-  &.active {
-    color: #fff;
-    background-color: #000;
-  }
-`;
 
-const Menu: React.FC = () => (
-  <>
-    <MenuContainer>
-      <StyledLink to="/">My Work</StyledLink>
-      <StyledLink to="/about-me">About Me</StyledLink>
-      <StyledLink to="/contact">Contact</StyledLink>
-    </MenuContainer>
-    <MenuButton>
-      <MenuIcon />
-    </MenuButton>
-  </>
-);
+
+const Menu: React.FC = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const links = [
+    { to: '/', label: 'My Work' },
+    { to: '/about-me', label: 'About Me' },
+    { to: '/contact', label: 'Contact' },
+  ];
+  return (
+    <>
+      <MenuContainer>
+        {links.map(link => (
+          <Button
+            key={link.to}
+            colorScheme={location.pathname === link.to ? 'blackAlpha' : 'gray'}
+            variant={location.pathname === link.to ? 'solid' : 'ghost'}
+            onClick={() => navigate(link.to)}
+            size="sm"
+            mr={2}
+          >
+            {link.label}
+          </Button>
+        ))}
+      </MenuContainer>
+      <MenuButton>
+        <MenuIcon />
+      </MenuButton>
+    </>
+  );
+};
 
 export default Menu;
