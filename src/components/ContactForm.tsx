@@ -34,7 +34,7 @@ interface ContactFormProps {
 }
 
 const ContactForm: React.FC<ContactFormProps> = ({ onCancel }) => {
-  const { register, handleSubmit, reset, formState: { errors, isSubmitting, isSubmitSuccessful } } = useForm<FormData>();
+  const { register, handleSubmit, reset, formState: { errors, isSubmitting, isSubmitSuccessful, isSubmitted } } = useForm<FormData>();
   const [serverResponse, setServerResponse] = React.useState<string | null>(null);
 
   const onSubmit = async (data: FormData) => {
@@ -66,15 +66,33 @@ const ContactForm: React.FC<ContactFormProps> = ({ onCancel }) => {
           <Fieldset.Content>
             <Field.Root>
               <Field.Label>Name</Field.Label>
-              <Input size="lg" {...register('name', { required: 'El nombre es obligatorio' })} />
+              <Input size="lg" {...register('name', { required: 'The name is required' })} />
+              {errors.name && isSubmitted && (
+                <span style={{ color: 'red', fontSize: 13 }}>{errors.name.message}</span>
+              )}
             </Field.Root>
             <Field.Root>
               <Field.Label>Email address</Field.Label>
-              <Input size="lg" {...register('email', { required: 'El email es obligatorio' })} type="email" />
+              <Input
+                size="lg"
+                {...register('email', {
+                  required: 'The email is required',
+                  pattern: {
+                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                    message: 'Please enter a valid email address',
+                  },
+                })}
+              />
+              {errors.email && isSubmitted && (
+                <span style={{ color: 'red', fontSize: 13 }}>{errors.email.message}</span>
+              )}
             </Field.Root>
             <Field.Root>
               <Field.Label>Message</Field.Label>
-              <Textarea size="lg" {...register('message', { required: 'El mensaje es obligatorio' })} />
+              <Textarea size="lg" {...register('message', { required: 'The message is required' })} />
+              {errors.message && isSubmitted && (
+                <span style={{ color: 'red', fontSize: 13 }}>{errors.message.message}</span>
+              )}
             </Field.Root>
           </Fieldset.Content>
           <ActionsContainer>

@@ -37,3 +37,7 @@ body {
 .chakra-dialog__content {
   margin-top: 150px !important;
 }
+
+.chakra-dialog__backdrop {
+  background-color: #ffffff91;
+}

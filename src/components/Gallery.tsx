@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useLightboxStore } from '../store/lightboxStore';
+import { useAppStore } from '../store/appStore';
 import Lightbox from 'yet-another-react-lightbox';
 import { ChevronLeft, ChevronRight, Copy, X } from 'lucide-react';
 import styled from 'styled-components';
@@ -33,8 +33,9 @@ const [mainImages, setMainImages] = useState<{
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const open = useLightboxStore(state => state.isLightboxOpen);
-  const setOpen = useLightboxStore(state => state.setLightboxOpen);
+  const showBlur = useAppStore(state => state.showBlur);
+  const setShowBlur = useAppStore(state => state.setShowBlur);
+  const [open, setOpen] = useState(false);
   const [index, setIndex] = useState(0);
   const [lightboxImages, setLightboxImages] = useState<string[]>([]);
 
@@ -76,6 +77,7 @@ const [mainImages, setMainImages] = useState<{
     const idx = lightboxImages.findIndex(url => url === imgUrl);
     setIndex(idx >= 0 ? idx : 0);
     setOpen(true);
+    setShowBlur(true);
   };
 
   return (
@@ -93,7 +95,7 @@ const [mainImages, setMainImages] = useState<{
     }
     { 
       !loading &&
-      <GalleryGrid blur={open}>
+      <GalleryGrid blur={showBlur ? true : undefined}>
         {mainImages.map((img) => (
           <div
             key={img.url}
@@ -129,7 +131,7 @@ const [mainImages, setMainImages] = useState<{
     }      
     <Lightbox
       open={open}
-      close={() => setOpen(false)}
+      close={() => { setOpen(false); setShowBlur(false); }}
       slides={lightboxImages.map(url => ({ src: url }))}
       index={index}
       on={{ view: ({ index: i }) => setIndex(i) }}

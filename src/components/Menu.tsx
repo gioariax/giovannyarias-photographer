@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { Button, CloseButton, Portal } from "@chakra-ui/react"
 import { Dialog } from "@chakra-ui/react"
 import ContactForm from './ContactForm';
+import { useAppStore } from '@/store/appStore';
 
 const MenuContainer = styled.nav`
   display: flex;
@@ -39,6 +40,7 @@ const Menu: React.FC = () => {
     { to: '/about-me', label: 'About Me' },
   ];
   const [open, setOpen] = React.useState(false);
+  const setShowBlur = useAppStore(state => state.setShowBlur);
   return (
     <>
       <MenuContainer>
@@ -57,11 +59,12 @@ const Menu: React.FC = () => {
         <Dialog.Root
           open={open}
           onOpenChange={(details) => setOpen(details.open)}
+          onExitComplete={() => { setShowBlur(false); }}
           key={size}
           size={size}
         >
           <Dialog.Trigger asChild>
-            <Button size="sm" variant={'ghost'} onClick={() => setOpen(true)}>
+            <Button size="sm" variant={'ghost'} onClick={() => { setOpen(true); setShowBlur(true); }}>
               Contact
             </Button>
           </Dialog.Trigger>
@@ -70,12 +73,12 @@ const Menu: React.FC = () => {
             <Dialog.Positioner>
               <Dialog.Content>
                 <Dialog.Header>
-                  <Dialog.Title>Contact me!</Dialog.Title>
+                  <Dialog.Title>Contact</Dialog.Title>
                 </Dialog.Header>
                 <Dialog.Body>
-                  <ContactForm onCancel={() => setOpen(false)} />
+                  <ContactForm onCancel={() => { setOpen(false); setShowBlur(false); }} />
                   <Dialog.CloseTrigger asChild>
-                    <CloseButton size="sm" />
+                    <CloseButton size="sm" onClick={() => { setShowBlur(false); }} />
                   </Dialog.CloseTrigger>
                 </Dialog.Body>
               </Dialog.Content>
