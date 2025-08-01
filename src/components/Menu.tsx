@@ -1,8 +1,7 @@
-import { MenuIcon } from 'lucide-react';
 import React from 'react';
-import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { Button, CloseButton, Portal, Drawer } from "@chakra-ui/react"
+import { Button, CloseButton, Portal } from "@chakra-ui/react"
 import { Dialog } from "@chakra-ui/react"
 import ContactForm from './ContactForm';
 import { useAppStore } from '@/store/appStore';
@@ -30,13 +29,12 @@ const MenuMobileContainer = styled.div`
 const Menu: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [size, setSize] = React.useState<'sm' | 'md' | 'lg'>('md');
+  const [size] = React.useState<'sm' | 'md' | 'lg'>('md');
   const links = [
     { to: '/', label: 'My Work' },
     { to: '/about-me', label: 'About Me' },
   ];
   const [open, setOpen] = React.useState(false);
-  const [openDrawer, setOpenDrawer] = React.useState(false);
   const setShowBlur = useAppStore(state => state.setShowBlur);
   
   return (

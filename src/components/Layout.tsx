@@ -1,11 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import logo from '../assets/images/giovannyarias-logo.svg';
 import { Container } from './SharedStyled';
 import Menu from './Menu';
-import MenuMobile from './MenuMobile';
-// Add the correct import for Drawer components
-import { Button, CloseButton, Drawer, Portal } from "@chakra-ui/react"
 import { useAppStore } from '@/store/appStore';
 
 const Header = styled.header`

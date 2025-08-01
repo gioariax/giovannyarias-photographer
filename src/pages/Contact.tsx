@@ -1,5 +1,5 @@
 import React from 'react';
-import { Backdrop, Container, ContainerCentered } from '../components/SharedStyled';
+import { Container } from '../components/SharedStyled';
 import styled from 'styled-components';
 import ContactForm from '@/components/ContactForm';
 

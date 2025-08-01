@@ -51,6 +51,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ onCancel }) => {
         if (onCancel) {
           onCancel();
         }
+        console.log(serverResponse);
       } else {
         setServerResponse('Error al enviar el mensaje.');
       }

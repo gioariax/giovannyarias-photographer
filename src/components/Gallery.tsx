@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAppStore } from '../store/appStore';
 import Lightbox from 'yet-another-react-lightbox';
-import { ChevronLeft, ChevronRight, Copy, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Copy } from 'lucide-react';
 import styled from 'styled-components';
 import { CloseButton, ProgressCircle } from '@chakra-ui/react';
 import { ContainerCentered } from './SharedStyled';
@@ -38,7 +38,6 @@ const [mainImages, setMainImages] = useState<{
 }[]>([]);
 
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const showBlur = useAppStore(state => state.showBlur);
   const setShowBlur = useAppStore(state => state.setShowBlur);
   const setShowHeader = useAppStore(state => state.setShowHeader);
@@ -70,7 +69,7 @@ const [mainImages, setMainImages] = useState<{
         setMainImages(mains);
         setLightboxImages(allImages);
       } catch (e: any) {
-        setError(e.message || 'Error al descargar contenido');
+        console.log('Error fetching content:', e);
       } finally {
         setLoading(false);
       }

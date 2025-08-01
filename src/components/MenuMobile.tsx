@@ -1,8 +1,6 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, Drawer, CloseButton, Portal } from '@chakra-ui/react';
-import { Dialog } from '@chakra-ui/react';
-import ContactForm from './ContactForm';
 import { MenuIcon } from 'lucide-react';
 
 const links = [
