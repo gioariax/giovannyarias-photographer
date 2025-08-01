@@ -1,8 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import logo from '../assets/images/giovannyarias-logo.svg';
 import { Container } from './SharedStyled';
 import Menu from './Menu';
+import MenuMobile from './MenuMobile';
+// Add the correct import for Drawer components
+import { Button, CloseButton, Drawer, Portal } from "@chakra-ui/react"
+import { useAppStore } from '@/store/appStore';
 
 const Header = styled.header`
   display: flex;
@@ -10,12 +14,17 @@ const Header = styled.header`
   align-items: center;
   padding: 2rem 0;
   justify-content: space-between;
-  gap: 16px
+  gap: 16px;
+  background: transparent;
 `;
 
 const Logo = styled.img`
   width: 120px;
   height: auto;
+
+  @media (max-width: 1000px) {
+    width: 100px;
+  }
 `;
 
 const Brand = styled.div`
@@ -44,24 +53,32 @@ const Job = styled.div`
 `;
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  
+  const showHeader = useAppStore(state => state.showHeader);
+  
   return (
     <>
-      <Container>
+      <Container style={{ background: 'transparent', padding: 0 }}>
         <Header>
           <Brand>
             <Logo src={logo} alt="Logo Giovanny Arias" />
-            <Name>
-              <span>
-                Giovanny Arias
-              </span>
-              <Job>
-                Photographer
-              </Job>
-            </Name>
+            {
+              showHeader && 
+              <Name>
+                <span>
+                  Giovanny Arias
+                </span>
+                <Job>
+                  Photographer
+                </Job>
+              </Name>
+            }
           </Brand>
-          <Menu />
+          {showHeader && <Menu />}
         </Header>
+        
       </Container>
+      
       {children}
     </>
   );

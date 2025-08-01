@@ -60,7 +60,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ onCancel }) => {
   };
 
   return (
-    <Fieldset.Root size="lg" maxW="lg">
+    <Fieldset.Root size="lg">
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack>
           <Fieldset.Content>
@@ -96,9 +96,12 @@ const ContactForm: React.FC<ContactFormProps> = ({ onCancel }) => {
             </Field.Root>
           </Fieldset.Content>
           <ActionsContainer>
-            <Button type="button" variant="ghost" onClick={onCancel} alignSelf="flex-start">
-                Cancel
-            </Button>
+            {
+              onCancel &&
+              <Button type="button" variant="ghost" onClick={onCancel} alignSelf="flex-start">
+                  Cancel
+              </Button>
+            }
             <Button type="submit" alignSelf="flex-start" disabled={isSubmitting}>
                 Send
             </Button>

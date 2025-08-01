@@ -3,27 +3,33 @@ import { useAppStore } from '../store/appStore';
 import Lightbox from 'yet-another-react-lightbox';
 import { ChevronLeft, ChevronRight, Copy, X } from 'lucide-react';
 import styled from 'styled-components';
-import { ProgressCircle } from '@chakra-ui/react';
+import { CloseButton, ProgressCircle } from '@chakra-ui/react';
 import { ContainerCentered } from './SharedStyled';
 
 const REGION = 'eu-west-2';
 const BUCKET = 'giovannyarias-photos';
 
-interface GalleryGridProps {
-  blur?: boolean;
-}
-
-const GalleryGrid = styled.div<GalleryGridProps>`
+const GalleryGrid = styled.div<{ $blur?: boolean }>`
   display: grid;
   gap: 16px;
   margin-bottom: 24px;
-  filter: ${({ blur }) => (blur ? 'blur(8px)' : 'none')};
+  filter: ${({ $blur }) => ($blur ? 'blur(8px)' : 'none')};
   grid-template-columns: repeat(2, 1fr);
 
   @media (min-width: 1000px) {
     gap: 24px;
     grid-template-columns: repeat(3, 1fr);
   }
+`;
+
+const CloseConatiner = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background-color: #fff;
 `;
 
 const Gallery: React.FC = () => {
@@ -35,6 +41,7 @@ const [mainImages, setMainImages] = useState<{
   const [error, setError] = useState<string | null>(null);
   const showBlur = useAppStore(state => state.showBlur);
   const setShowBlur = useAppStore(state => state.setShowBlur);
+  const setShowHeader = useAppStore(state => state.setShowHeader);
   const [open, setOpen] = useState(false);
   const [index, setIndex] = useState(0);
   const [lightboxImages, setLightboxImages] = useState<string[]>([]);
@@ -60,8 +67,6 @@ const [mainImages, setMainImages] = useState<{
           });
         });
 
-        console.log('Mains:', mains);
-
         setMainImages(mains);
         setLightboxImages(allImages);
       } catch (e: any) {
@@ -78,6 +83,7 @@ const [mainImages, setMainImages] = useState<{
     setIndex(idx >= 0 ? idx : 0);
     setOpen(true);
     setShowBlur(true);
+    setShowHeader(false);
   };
 
   return (
@@ -95,7 +101,7 @@ const [mainImages, setMainImages] = useState<{
     }
     { 
       !loading &&
-      <GalleryGrid blur={showBlur ? true : undefined}>
+      <GalleryGrid $blur={showBlur}>
         {mainImages.map((img) => (
           <div
             key={img.url}
@@ -131,14 +137,14 @@ const [mainImages, setMainImages] = useState<{
     }      
     <Lightbox
       open={open}
-      close={() => { setOpen(false); setShowBlur(false); }}
+      close={() => { setOpen(false); setShowBlur(false); setShowHeader(true); }}
       slides={lightboxImages.map(url => ({ src: url }))}
       index={index}
       on={{ view: ({ index: i }) => setIndex(i) }}
       render={{
         iconPrev: () => <ChevronLeft />,
         iconNext: () => <ChevronRight />,
-        iconClose: () => <X />,
+        iconClose: () => <CloseConatiner><CloseButton /></CloseConatiner>
       }}
     />
   </>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Backdrop, ContainerCentered } from '../components/SharedStyled';
+import { Backdrop, Container, ContainerCentered } from '../components/SharedStyled';
 import styled from 'styled-components';
 import ContactForm from '@/components/ContactForm';
 
@@ -11,13 +11,9 @@ export const ContactContainer = styled.div`
 
 const Contact: React.FC = () => {
   return (
-    <Backdrop>
-      <ContainerCentered>
-        <ContactContainer>
-          <ContactForm />
-        </ContactContainer>
-      </ContainerCentered>
-    </Backdrop>
+    <Container>
+      <ContactForm />
+    </Container>
   );
 };
 

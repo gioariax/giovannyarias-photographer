@@ -4,12 +4,36 @@ import MyWork from './pages/MyWork';
 import AboutMe from './pages/AboutMe';
 import Contact from './pages/Contact';
 import Layout from './components/Layout';
-import { LightMode } from "@/components/ui/color-mode"
+import { useColorMode, useColorModeValue } from "@/components/ui/color-mode"
+import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+
+
+function usePageView() {
+  const location = useLocation();
+  useEffect(() => {
+    if (window.gtag) {
+      window.gtag('config', 'G-017F926TGP', {
+        page_path: location.pathname + location.search,
+      });
+    }
+  }, [location]);
+}
+
+function PageViewWrapper({ children }: { children: React.ReactNode }) {
+  usePageView();
+  return <>{children}</>;
+}
 
 function App() {
+  const colorMode = useColorModeValue("<light-mode-value>", "<dark-mode-value>");
+  const { toggleColorMode } = useColorMode()
+  if(colorMode === "<dark-mode-value>") {
+    toggleColorMode();
+  }
   return (
     <Router>
-      <LightMode>
+      <PageViewWrapper>
         <Layout>
           <Routes>
             <Route path="/" element={<MyWork />} />
@@ -17,7 +41,7 @@ function App() {
             <Route path="/contact" element={<Contact />} />
           </Routes>
         </Layout>
-      </LightMode>
+      </PageViewWrapper>
     </Router>
   );
 }

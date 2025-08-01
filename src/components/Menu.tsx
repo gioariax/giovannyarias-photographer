@@ -2,10 +2,11 @@ import { MenuIcon } from 'lucide-react';
 import React from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { Button, CloseButton, Portal } from "@chakra-ui/react"
+import { Button, CloseButton, Portal, Drawer } from "@chakra-ui/react"
 import { Dialog } from "@chakra-ui/react"
 import ContactForm from './ContactForm';
 import { useAppStore } from '@/store/appStore';
+import MenuMobile from './MenuMobile';
 
 const MenuContainer = styled.nav`
   display: flex;
@@ -16,15 +17,10 @@ const MenuContainer = styled.nav`
   }
 `;
 
-const MenuButton = styled.button`
+const MenuMobileContainer = styled.div`
   display: none;
-  background: transparent;
-  border: none;
   cursor: pointer;
-  
-  svg {
-    stroke: #000 !important;
-  }
+  margin: -16px 0 0 0;
 
   @media (max-width: 1000px) {
     display: block;
@@ -40,7 +36,9 @@ const Menu: React.FC = () => {
     { to: '/about-me', label: 'About Me' },
   ];
   const [open, setOpen] = React.useState(false);
+  const [openDrawer, setOpenDrawer] = React.useState(false);
   const setShowBlur = useAppStore(state => state.setShowBlur);
+  
   return (
     <>
       <MenuContainer>
@@ -86,9 +84,9 @@ const Menu: React.FC = () => {
           </Portal>
         </Dialog.Root>
       </MenuContainer>
-      <MenuButton>
-        <MenuIcon />
-      </MenuButton>
+      <MenuMobileContainer>
+        <MenuMobile />
+      </MenuMobileContainer>
     </>
   );
 };
