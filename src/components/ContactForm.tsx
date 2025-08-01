@@ -34,7 +34,7 @@ interface ContactFormProps {
 }
 
 const ContactForm: React.FC<ContactFormProps> = ({ onCancel }) => {
-  const { register, handleSubmit, reset, formState: { errors, isSubmitting, isSubmitSuccessful, isSubmitted } } = useForm<FormData>();
+  const { register, handleSubmit, reset, formState: { errors, isSubmitting, isSubmitted } } = useForm<FormData>();
   const [serverResponse, setServerResponse] = React.useState<string | null>(null);
 
   const onSubmit = async (data: FormData) => {
