@@ -4,7 +4,7 @@ import { Container } from '../components/SharedStyled';
 
 const MyWork: React.FC = () => {
   return (
-    <Container>
+    <Container style={{ display: 'flex', flex: 1 }}>
       <Gallery />
     </Container>
   );

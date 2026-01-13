@@ -5,6 +5,12 @@ import { Container } from './SharedStyled';
 import Menu from './Menu';
 import { useAppStore } from '@/store/appStore';
 
+const LayoutWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+`;
+
 const Header = styled.header`
   display: flex;
   justify-content: center;
@@ -54,7 +60,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const showHeader = useAppStore(state => state.showHeader);
   
   return (
-    <>
+    <LayoutWrapper>
       <Container style={{ background: 'transparent', padding: 0 }}>
         <Header>
           <Brand>
@@ -77,7 +83,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       </Container>
       
       {children}
-    </>
+    </LayoutWrapper>
   );
 };
 
