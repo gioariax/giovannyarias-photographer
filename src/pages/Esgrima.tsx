@@ -115,6 +115,7 @@ export default function Esgrima() {
             className="esgrima__primary-image"
             src={photos[index]}
             alt={`Fotografía de esgrima ${index + 1}`}
+            onClick={next}
             onPanEnd={handlePanEnd}
           />
         </div>
