@@ -8,6 +8,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import MyWork from './pages/MyWork';
 import AboutMe from './pages/AboutMe';
 import Contact from './pages/Contact';
+import Esgrima from './pages/Esgrima';
 import Layout from './components/Layout';
 import { useColorMode, useColorModeValue } from "@/components/ui/color-mode"
 import { useEffect } from 'react';
@@ -39,13 +40,12 @@ function App() {
   return (
     <Router>
       <PageViewWrapper>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<MyWork />} />
-            <Route path="/about-me" element={<AboutMe />} />
-            <Route path="/contact" element={<Contact />} />
-          </Routes>
-        </Layout>
+        <Routes>
+          <Route path="/esgrima" element={<Esgrima />} />
+          <Route path="/" element={<Layout><MyWork /></Layout>} />
+          <Route path="/about-me" element={<Layout><AboutMe /></Layout>} />
+          <Route path="/contact" element={<Layout><Contact /></Layout>} />
+        </Routes>
       </PageViewWrapper>
     </Router>
   );

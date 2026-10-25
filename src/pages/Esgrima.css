@@ -1,0 +1,195 @@
+.esgrima {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100dvh;
+  overflow: hidden;
+  background: #0b0b0b;
+  color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  overscroll-behavior: none;
+}
+
+.esgrima *, .esgrima *::before, .esgrima *::after {
+  box-sizing: border-box;
+}
+
+.esgrima__header {
+  display: flex;
+  flex: 0 0 60px;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 30px;
+}
+
+.esgrima__photographers-button, .esgrima__close-button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.esgrima__photographers-button {
+  display: flex;
+  opacity: 0.8;
+}
+
+.esgrima__stage {
+  position: relative;
+  display: flex;
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.esgrima__primary-photo {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.esgrima__primary-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.esgrima__mask-grid {
+  display: none;
+}
+
+.esgrima__footer {
+  display: flex;
+  flex: 0 0 60px;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 30px 60px;
+}
+
+.esgrima__slider {
+  width: 100%;
+  max-width: 400px;
+  cursor: pointer;
+  accent-color: #fff;
+  opacity: 0.3;
+}
+
+.esgrima__modal-backdrop {
+  position: fixed;
+  z-index: 200;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 100dvh;
+  background: rgb(0 0 0 / 85%);
+  backdrop-filter: blur(5px);
+}
+
+.esgrima__modal {
+  width: 90%;
+  max-width: 400px;
+  max-height: 80dvh;
+  overflow-y: auto;
+  padding: 30px;
+  border-radius: 16px;
+  background: #151515;
+  box-shadow: 0 20px 50px rgb(0 0 0 / 50%);
+}
+
+.esgrima__modal-header {
+  position: sticky;
+  top: -30px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  padding: 30px 0 10px;
+  background: #151515;
+}
+
+.esgrima__modal-header h1 {
+  flex: 1;
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 400;
+  letter-spacing: 2px;
+  text-align: center;
+}
+
+.esgrima__close-button {
+  position: absolute;
+  right: 0;
+  font-size: 2rem;
+  line-height: 0.5;
+}
+
+.esgrima__photographers-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: #e0e0e0;
+  font-size: 0.95rem;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+.esgrima__photographers-list li {
+  padding: 6px 0;
+}
+
+@media (min-width: 1024px) {
+  .esgrima__stage {
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    padding: 0 32px;
+  }
+
+  .esgrima__primary-photo {
+    display: flex;
+    flex: 0 1 auto;
+    width: auto;
+    height: 100%;
+    max-width: calc(100vw - (66.7vh - 69.4px) - 96px);
+    align-items: center;
+  }
+
+  .esgrima__mask-grid {
+    display: grid;
+    grid-template: repeat(2, minmax(0, 1fr)) / repeat(2, minmax(0, 1fr));
+    flex: 0 0 auto;
+    align-self: center;
+    gap: 32px;
+    width: calc(66.7vh - 69.4px);
+    height: 100%;
+  }
+
+  .esgrima__mask-photo {
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    object-fit: contain;
+    opacity: 0.2;
+    transition: opacity 0.2s ease;
+  }
+
+  .esgrima__mask-photo:hover {
+    opacity: 1;
+  }
+
+  .esgrima__primary-image {
+    position: relative;
+    inset: auto;
+    width: auto;
+    max-width: 100%;
+    height: 100%;
+    object-position: center;
+  }
+}
