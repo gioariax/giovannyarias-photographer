@@ -21,9 +21,13 @@ const photos = [
   '_DSC8129.jpg',
 ].map((filename) => `/esgrima/photos/${filename}`);
 
-const maskPhotos = ['_DSC8889.jpg', '_DSC8906.jpg', '_DSC8893.jpg', '_DSC8898.jpg', '_DSC8908.jpg'].map(
-  (filename) => `/esgrima/photos/mask/${filename}`,
-);
+const maskPhotos = Object.values(
+  import.meta.glob<string>('/public/esgrima/photos/mask/*.{jpg,jpeg,png,webp,avif,JPG,JPEG,PNG,WEBP,AVIF}', {
+    eager: true,
+    query: '?url',
+    import: 'default',
+  }),
+).sort();
 
 const photographers = [
   'Ángela Cuesta',
@@ -246,7 +250,7 @@ export default function Esgrima() {
                 <figure className="esgrima__intro-figure">
                   <div className="esgrima__intro-image-wrap">
                     <img
-                      src={maskPhotos[0]}
+                      src="/esgrima/photos/mask/_DSC9117.jpg"
                       alt="Retrato de un estudiante de esgrima con careta, iluminado sobre fondo negro"
                       width="667"
                       height="1000"
