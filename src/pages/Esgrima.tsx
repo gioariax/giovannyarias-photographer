@@ -244,13 +244,13 @@ export default function Esgrima() {
                     </span>
                   </Link>
                   <p className="esgrima__series-note">
-                    {photos.length} fotografías <span aria-hidden="true">/</span> Una mirada colectiva
+                    {photos.length + maskPhotos.length} fotografías <span aria-hidden="true">/</span> Una mirada colectiva
                   </p>
                 </div>
                 <figure className="esgrima__intro-figure">
                   <div className="esgrima__intro-image-wrap">
                     <img
-                      src="/esgrima/photos/mask/_DSC9117.jpg"
+                      src="/esgrima/photos/mask/_DSC8938.jpg"
                       alt="Retrato de un estudiante de esgrima con careta, iluminado sobre fondo negro"
                       width="667"
                       height="1000"
