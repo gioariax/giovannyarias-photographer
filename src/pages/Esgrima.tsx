@@ -52,6 +52,9 @@ const photographerLinks: Record<string, string> = {
   'Teresa Ariste': 'https://www.instagram.com/teresaariste/',
 };
 
+const academyUrl = 'https://www.academiainternacionaldeesgrima.com/club-esgrima-barajas';
+const schoolUrl = 'https://www.alcobendas.org/es/temas/educacion/PIC.A_Escuela';
+
 function ProjectCredits() {
   return (
     <div className="esgrima__credits-grid">
@@ -90,6 +93,20 @@ function ProjectCredits() {
           <dt>Diseño y desarrollo web</dt>
           <dd>
             <Link to="/">Giovanny Arias</Link><span>Creación del medio expositivo</span>
+          </dd>
+        </div>
+        <div>
+          <dt>Lugar de realización</dt>
+          <dd>
+            <a href={academyUrl} target="_blank" rel="noopener noreferrer">Academia Internacional de Esgrima (AIE)</a>
+            <span>Barajas, Madrid</span>
+          </dd>
+        </div>
+        <div>
+          <dt>Centro de estudios</dt>
+          <dd>
+            <a href={schoolUrl} target="_blank" rel="noopener noreferrer">PIC.A Escuela Internacional de Fotografía Alcobendas</a>
+            <span>Grupo 3c</span>
           </dd>
         </div>
       </dl>
@@ -211,8 +228,10 @@ export default function Esgrima() {
                     <em>una mirada.</em>
                   </p>
                   <p className="esgrima__intro-description">
-                    Retratos de estudiantes de la Academia Internacional de Esgrima (AIE), en Barajas. Un encuentro
-                    entre la fotografía y la esgrima, realizado por nuestro grupo de estudios de fotografía, 3c.
+                    Retratos de estudiantes de la{' '}
+                    <a href={academyUrl} target="_blank" rel="noopener noreferrer">Academia Internacional de Esgrima (AIE), en Barajas</a>.
+                    {' '}Un encuentro entre la fotografía y la esgrima, realizado por el grupo 3c de{' '}
+                    <a href={schoolUrl} target="_blank" rel="noopener noreferrer">PIC.A Escuela Internacional de Fotografía Alcobendas</a>.
                   </p>
                   <Link className="esgrima__enter" to="#exposicion">
                     <span>Entrar en la exposición</span>
