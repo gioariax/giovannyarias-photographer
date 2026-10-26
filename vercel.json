@@ -1,6 +1,14 @@
 {
   "rewrites": [
     {
+      "source": "/esgrima",
+      "destination": "/esgrima.html"
+    },
+    {
+      "source": "/esgrima/",
+      "destination": "/esgrima.html"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
