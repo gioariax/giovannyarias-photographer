@@ -3,23 +3,13 @@ import { AnimatePresence, motion as Motion, useReducedMotion, type PanInfo } fro
 import { Link, useLocation } from 'react-router-dom';
 import './Esgrima.css';
 
-const photos = [
-  '_DSC7975.jpg',
-  '_DSC7990.jpg',
-  '_DSC8006.jpg',
-  '_DSC8016.jpg',
-  '_DSC8026.jpg',
-  '_DSC8035.jpg',
-  '_DSC8040.jpg',
-  '_DSC8048.jpg',
-  '_DSC8058.jpg',
-  '_DSC8067.jpg',
-  '_DSC8081.jpg',
-  '_DSC8100.jpg',
-  '_DSC8106.jpg',
-  '_DSC8124.jpg',
-  '_DSC8129.jpg',
-].map((filename) => `/esgrima/photos/${filename}`);
+const photos = Object.values(
+  import.meta.glob<string>('/public/esgrima/photos/*.{jpg,jpeg,png,webp,avif,JPG,JPEG,PNG,WEBP,AVIF}', {
+    eager: true,
+    query: '?url',
+    import: 'default',
+  }),
+).sort();
 
 const maskPhotos = Object.values(
   import.meta.glob<string>('/public/esgrima/photos/mask/*.{jpg,jpeg,png,webp,avif,JPG,JPEG,PNG,WEBP,AVIF}', {
@@ -118,7 +108,22 @@ function ProjectCredits() {
   );
 }
 
-const getRandomMaskPhotos = () => [...maskPhotos].sort(() => Math.random() - 0.5).slice(0, 4);
+function getNextMaskSelection(remaining: string[] = []) {
+  let pending = [...remaining];
+  const gridPhotos: string[] = [];
+
+  while (gridPhotos.length < Math.min(4, maskPhotos.length)) {
+    if (pending.length === 0) pending = [...maskPhotos];
+
+    // At a round boundary, keep the four images in this grid distinct.
+    const candidates = pending.filter((src) => !gridPhotos.includes(src));
+    const selected = candidates[Math.floor(Math.random() * candidates.length)];
+    gridPhotos.push(selected);
+    pending.splice(pending.indexOf(selected), 1);
+  }
+
+  return { gridPhotos, remaining: pending };
+}
 
 function CameraIcon() {
   return (
@@ -146,7 +151,7 @@ export default function Esgrima() {
   const reduceMotion = useReducedMotion();
   const viewRef = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
-  const [gridPhotos, setGridPhotos] = useState(getRandomMaskPhotos);
+  const [{ gridPhotos }, setMaskSelection] = useState(() => getNextMaskSelection());
 
   useEffect(() => {
     const previousTitle = document.title;
@@ -158,7 +163,7 @@ export default function Esgrima() {
 
   const changePhoto = (nextIndex: number) => {
     setIndex((nextIndex + photos.length) % photos.length);
-    setGridPhotos(getRandomMaskPhotos());
+    setMaskSelection((current) => getNextMaskSelection(current.remaining));
   };
 
   const next = () => changePhoto(index + 1);
@@ -173,12 +178,12 @@ export default function Esgrima() {
       if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
         event.preventDefault();
         setIndex((currentIndex) => (currentIndex + 1) % photos.length);
-        setGridPhotos(getRandomMaskPhotos());
+        setMaskSelection((current) => getNextMaskSelection(current.remaining));
       }
       if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
         event.preventDefault();
         setIndex((currentIndex) => (currentIndex - 1 + photos.length) % photos.length);
-        setGridPhotos(getRandomMaskPhotos());
+        setMaskSelection((current) => getNextMaskSelection(current.remaining));
       }
     };
 
