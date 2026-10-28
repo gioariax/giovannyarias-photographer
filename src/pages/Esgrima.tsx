@@ -27,6 +27,7 @@ const photographers = [
   'Javier Ruiz',
   'Jesús Simarro',
   'Miguel López',
+  'Nuria Martin',
   'Patricia Campos',
   'Raquel Polo',
   'Rubén Nieto',
