@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion as Motion, useReducedMotion, type PanInfo } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
+import { Eye, Play, Square } from 'lucide-react';
+import EsgrimaEyeTracking from './EsgrimaEyeTracking';
 import './Esgrima.css';
 
 const photos = Object.values(
@@ -126,33 +128,63 @@ function getNextMaskSelection(remaining: string[] = []) {
   return { gridPhotos, remaining: pending };
 }
 
-function CameraIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="28"
-      height="28"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" />
-      <circle cx="12" cy="13" r="3" />
-    </svg>
-  );
-}
-
 export default function Esgrima() {
-  const { hash } = useLocation();
+  const { hash, search } = useLocation();
   const isExhibition = hash === '#exposicion';
+  const params = new URLSearchParams(search);
+  const eyeAvailable = params.get('eye') === 'true';
+  const timeSeconds = Number(params.get('time'));
+  // Browser timers overflow above a signed 32-bit millisecond delay.
+  const intervalMs = Number.isFinite(timeSeconds) && timeSeconds > 0 && timeSeconds <= 2147483647 / 1000
+    ? Math.max(1, Math.round(timeSeconds * 1000)) : 15000;
+  const [eyeRequested, setEyeRequested] = useState(false);
+  const [desktop, setDesktop] = useState(() => window.matchMedia('(min-width: 1024px)').matches);
+  const eyeActive = eyeAvailable && isExhibition && desktop && eyeRequested;
+  const stageRef = useRef<HTMLElement>(null);
+  const eyeButtonRef = useRef<HTMLButtonElement>(null);
   const reduceMotion = useReducedMotion();
   const viewRef = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
   const [{ gridPhotos }, setMaskSelection] = useState(() => getNextMaskSelection());
+  const [playing, setPlaying] = useState(false);
+  const [trackingReady, setTrackingReady] = useState(false);
+  const isPlaying = isExhibition && playing;
+
+  useEffect(() => {
+    if (!isExhibition) setPlaying(false);
+  }, [isExhibition]);
+
+  useEffect(() => {
+    if (!isPlaying || (eyeActive && !trackingReady) || photos.length === 0) return;
+    // A new mask selection resets the delay after manual navigation as well.
+    const timer = window.setTimeout(() => {
+      setIndex((current) => (current + 1) % photos.length);
+      setMaskSelection((current) => getNextMaskSelection(current.remaining));
+    }, intervalMs);
+    return () => window.clearTimeout(timer);
+  }, [isPlaying, intervalMs, gridPhotos, eyeActive, trackingReady]);
+
+  const closeEye = () => {
+    setEyeRequested(false);
+    eyeButtonRef.current?.focus();
+  };
+
+  useEffect(() => { setEyeRequested(false); }, [isExhibition, eyeAvailable]);
+
+  useEffect(() => {
+    const media = window.matchMedia('(min-width: 1024px)');
+    const update = () => { setDesktop(media.matches); setEyeRequested(false); };
+    media.addEventListener('change', update);
+    // Resizing invalidates the mapping between the eyes and the viewport.
+    const reset = () => setEyeRequested(false);
+    window.addEventListener('resize', reset);
+    window.addEventListener('hashchange', reset);
+    return () => {
+      media.removeEventListener('change', update);
+      window.removeEventListener('resize', reset);
+      window.removeEventListener('hashchange', reset);
+    };
+  }, []);
 
   useEffect(() => {
     const previousTitle = document.title;
@@ -243,7 +275,7 @@ export default function Esgrima() {
                     {' '}Un encuentro entre la fotografía y la esgrima, realizado por el grupo 3c de{' '}
                     <a href={schoolUrl} target="_blank" rel="noopener noreferrer">PIC.A Escuela Internacional de Fotografía Alcobendas</a>.
                   </p>
-                  <Link className="esgrima__enter" to="#exposicion">
+                  <Link className="esgrima__enter" to={{ search, hash: '#exposicion' }}>
                     <span>Entrar en la exposición</span>
                     <span className="esgrima__enter-arrow" aria-hidden="true">
                       ↗
@@ -294,7 +326,7 @@ export default function Esgrima() {
               </section>
               <footer className="esgrima__intro-footer">
                 <span>Esgrima 3c · Proyecto fotográfico colectivo</span>
-                <Link to="#exposicion">
+                <Link to={{ search, hash: '#exposicion' }}>
                   Ver los retratos <span aria-hidden="true">↗</span>
                 </Link>
               </footer>
@@ -305,21 +337,37 @@ export default function Esgrima() {
                 <h1 className="esgrima__sr-only" tabIndex={-1} data-view-heading>
                   Esgrima 3c: exposición fotográfica
                 </h1>
-                <Link className="esgrima__back" to="#presentacion">
+                <Link className="esgrima__back" to={{ search, hash: '#presentacion' }}>
                   ← <span>Proyecto y créditos</span>
                 </Link>
-                <Link
+                {eyeAvailable && desktop && (
+                  <button
+                    ref={eyeButtonRef}
+                    type="button"
+                    className="esgrima__photographers-button esgrima__eye-button"
+                    aria-label={eyeActive ? 'Desactivar seguimiento con cámara' : 'Elegir interacción con mirada, cabeza o dedo'}
+                    aria-pressed={eyeActive}
+                    title={eyeActive ? 'Desactivar seguimiento' : 'Mirada, cabeza o señalar con el dedo'}
+                    onClick={() => setEyeRequested(!eyeActive)}
+                  >
+                    <Eye size={28} strokeWidth={1.5} aria-hidden="true" />
+                  </button>
+                )}
+                <button
+                  type="button"
                   className="esgrima__photographers-button"
-                  to="#presentacion"
-                  aria-label="Volver a la presentación del proyecto"
+                  aria-label={isPlaying ? 'Detener reproducción automática' : 'Iniciar reproducción automática'}
+                  aria-pressed={isPlaying}
+                  title={isPlaying ? 'Detener reproducción automática' : `Reproducir cada ${intervalMs / 1000} segundos`}
+                  onClick={() => setPlaying((current) => !current)}
                 >
-                  <CameraIcon />
-                </Link>
+                  {isPlaying ? <Square size={18} strokeWidth={1.5} aria-hidden="true" /> : <Play size={18} strokeWidth={1.5} aria-hidden="true" />}
+                </button>
               </header>
 
-              <section className="esgrima__stage" aria-label="Galería de esgrima">
+              <section ref={stageRef} className={`esgrima__stage${eyeActive ? ' esgrima__stage--eye' : ''}`} aria-label="Galería de esgrima">
                 <div className="esgrima__mask-grid" aria-hidden="true">
-                  {gridPhotos.map((src) => (
+                  {(eyeActive ? gridPhotos.slice(0, 2) : gridPhotos).map((src) => (
                     <img key={`${index}-${src}`} className="esgrima__mask-photo" src={src} alt="" />
                   ))}
                 </div>
@@ -345,6 +393,8 @@ export default function Esgrima() {
                   aria-label="Seleccionar fotografía"
                 />
               </footer>
+
+              {eyeActive && <EsgrimaEyeTracking stageRef={stageRef} onClose={closeEye} onReadyChange={setTrackingReady} />}
 
             </>
           )}
