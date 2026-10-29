@@ -128,6 +128,78 @@ function getNextMaskSelection(remaining: string[] = []) {
   return { gridPhotos, remaining: pending };
 }
 
+type CrossfadeImageProps = {
+  src: string;
+  className: string;
+  alt: string;
+  reduceMotion: boolean | null;
+  onClick?: () => void;
+  onPanEnd?: (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => void;
+};
+
+function CrossfadeImage({ src, className, alt, reduceMotion, onClick, onPanEnd }: CrossfadeImageProps) {
+  const [visibleSrc, setVisibleSrc] = useState(src);
+  const [aspectRatio, setAspectRatio] = useState<number>();
+
+  useEffect(() => {
+    if (src === visibleSrc) return;
+
+    let cancelled = false;
+    const image = new Image();
+    const showImage = () => {
+      const decoded = image.decode?.();
+      if (decoded) {
+        void decoded.catch(() => undefined).then(() => {
+          if (!cancelled) {
+            setAspectRatio(image.naturalWidth / image.naturalHeight);
+            setVisibleSrc(src);
+          }
+        });
+      } else if (!cancelled) {
+        setAspectRatio(image.naturalWidth / image.naturalHeight);
+        setVisibleSrc(src);
+      }
+    };
+
+    image.addEventListener('load', showImage, { once: true });
+    image.src = src;
+    if (image.complete && image.naturalWidth > 0) showImage();
+
+    return () => {
+      cancelled = true;
+      image.removeEventListener('load', showImage);
+    };
+  }, [src, visibleSrc]);
+
+  const transition = { duration: reduceMotion ? 0 : 0.5, ease: 'easeInOut' as const };
+
+  return (
+    <div className={className} style={aspectRatio ? { aspectRatio } : undefined}>
+      <img
+        className="esgrima__image-sizer"
+        src={visibleSrc}
+        alt=""
+        aria-hidden="true"
+        onLoad={(event) => setAspectRatio(event.currentTarget.naturalWidth / event.currentTarget.naturalHeight)}
+      />
+      <AnimatePresence initial={false}>
+        <Motion.img
+          key={visibleSrc}
+          className="esgrima__image-layer"
+          src={visibleSrc}
+          alt={alt}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 1 }}
+          transition={transition}
+          onClick={onClick}
+          onPanEnd={onPanEnd}
+        />
+      </AnimatePresence>
+    </div>
+  );
+}
+
 export default function Esgrima() {
   const { hash, search } = useLocation();
   const isExhibition = hash === '#exposicion';
@@ -365,22 +437,25 @@ export default function Esgrima() {
                 </button>
               </header>
 
-              <section ref={stageRef} className={`esgrima__stage${eyeActive ? ' esgrima__stage--eye' : ''}`} aria-label="Galería de esgrima">
-                <div className="esgrima__mask-grid" aria-hidden="true">
-                  {(eyeActive ? gridPhotos.slice(0, 2) : gridPhotos).map((src) => (
-                    <img key={`${index}-${src}`} className="esgrima__mask-photo" src={src} alt="" />
-                  ))}
-                </div>
-                <div className="esgrima__primary-photo">
-                  <Motion.img
-                    className="esgrima__primary-image"
-                    src={photos[index]}
-                    alt={`Fotografía de esgrima ${index + 1}`}
-                    onClick={next}
-                    onPanEnd={handlePanEnd}
-                  />
-                </div>
-              </section>
+                <section ref={stageRef} className={`esgrima__stage${eyeActive ? ' esgrima__stage--eye' : ''}`} aria-label="Galería de esgrima">
+                  <div className="esgrima__mask-grid" aria-hidden="true">
+                    {(eyeActive ? gridPhotos.slice(0, 2) : gridPhotos).map((src, slot) => (
+                      <div key={slot} className="esgrima__mask-photo">
+                        <CrossfadeImage className="esgrima__mask-image" src={src} alt="" reduceMotion={reduceMotion} />
+                      </div>
+                    ))}
+                  </div>
+                  <div className="esgrima__primary-photo">
+                    <CrossfadeImage
+                      className="esgrima__primary-image"
+                      src={photos[index]}
+                      alt={`Fotografía de esgrima ${index + 1}`}
+                      reduceMotion={reduceMotion}
+                      onClick={next}
+                      onPanEnd={handlePanEnd}
+                    />
+                  </div>
+                </section>
 
               <footer className="esgrima__footer">
                 <input
