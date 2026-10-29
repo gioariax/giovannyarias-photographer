@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion as Motion, useReducedMotion, type PanInfo } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
 import { Eye, Play, Square } from 'lucide-react';
@@ -133,16 +133,18 @@ type CrossfadeImageProps = {
   className: string;
   alt: string;
   reduceMotion: boolean | null;
+  onAspectRatio?: (ratio: number) => void;
   onClick?: () => void;
   onPanEnd?: (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => void;
 };
 
-function CrossfadeImage({ src, className, alt, reduceMotion, onClick, onPanEnd }: CrossfadeImageProps) {
-  const [visibleSrc, setVisibleSrc] = useState(src);
-  const [aspectRatio, setAspectRatio] = useState<number>();
+function CrossfadeImage({ src, className, alt, reduceMotion, onAspectRatio, onClick, onPanEnd }: CrossfadeImageProps) {
+  const [displayedSrc, setDisplayedSrc] = useState(src);
+  const [incomingSrc, setIncomingSrc] = useState<string | null>(null);
+  const [, setQueuedSrc] = useState<string | null>(null);
 
   useEffect(() => {
-    if (src === visibleSrc) return;
+    if (src === displayedSrc || src === incomingSrc) return;
 
     let cancelled = false;
     const image = new Image();
@@ -151,13 +153,21 @@ function CrossfadeImage({ src, className, alt, reduceMotion, onClick, onPanEnd }
       if (decoded) {
         void decoded.catch(() => undefined).then(() => {
           if (!cancelled) {
-            setAspectRatio(image.naturalWidth / image.naturalHeight);
-            setVisibleSrc(src);
+            onAspectRatio?.(image.naturalWidth / image.naturalHeight);
+            setIncomingSrc((current) => {
+              if (!current) return src;
+              setQueuedSrc(src);
+              return current;
+            });
           }
         });
       } else if (!cancelled) {
-        setAspectRatio(image.naturalWidth / image.naturalHeight);
-        setVisibleSrc(src);
+        onAspectRatio?.(image.naturalWidth / image.naturalHeight);
+        setIncomingSrc((current) => {
+          if (!current) return src;
+          setQueuedSrc(src);
+          return current;
+        });
       }
     };
 
@@ -169,32 +179,42 @@ function CrossfadeImage({ src, className, alt, reduceMotion, onClick, onPanEnd }
       cancelled = true;
       image.removeEventListener('load', showImage);
     };
-  }, [src, visibleSrc]);
+  }, [src, displayedSrc, incomingSrc, onAspectRatio]);
 
   const transition = { duration: reduceMotion ? 0 : 0.5, ease: 'easeInOut' as const };
 
   return (
-    <div className={className} style={aspectRatio ? { aspectRatio } : undefined}>
-      <img
-        className="esgrima__image-sizer"
-        src={visibleSrc}
-        alt=""
-        aria-hidden="true"
-        onLoad={(event) => setAspectRatio(event.currentTarget.naturalWidth / event.currentTarget.naturalHeight)}
+    <div className={className}>
+      <Motion.img
+        className="esgrima__image-layer"
+        src={displayedSrc}
+        alt={alt}
+        onLoad={(event) => onAspectRatio?.(event.currentTarget.naturalWidth / event.currentTarget.naturalHeight)}
+        onClick={onClick}
+        onPanEnd={onPanEnd}
       />
       <AnimatePresence initial={false}>
+        {incomingSrc && (
         <Motion.img
-          key={visibleSrc}
+          key={incomingSrc}
           className="esgrima__image-layer"
-          src={visibleSrc}
-          alt={alt}
+          src={incomingSrc}
+          alt=""
+          aria-hidden="true"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 1 }}
           transition={transition}
+          onAnimationComplete={() => {
+            setDisplayedSrc(incomingSrc);
+            setQueuedSrc((queued) => {
+              setIncomingSrc(queued && queued !== incomingSrc ? queued : null);
+              return null;
+            });
+          }}
           onClick={onClick}
           onPanEnd={onPanEnd}
         />
+        )}
       </AnimatePresence>
     </div>
   );
@@ -208,11 +228,12 @@ export default function Esgrima() {
   const timeSeconds = Number(params.get('time'));
   // Browser timers overflow above a signed 32-bit millisecond delay.
   const intervalMs = Number.isFinite(timeSeconds) && timeSeconds > 0 && timeSeconds <= 2147483647 / 1000
-    ? Math.max(1, Math.round(timeSeconds * 1000)) : 15000;
+    ? Math.max(1, Math.round(timeSeconds * 1000)) : 10000;
   const [eyeRequested, setEyeRequested] = useState(false);
   const [desktop, setDesktop] = useState(() => window.matchMedia('(min-width: 1024px)').matches);
   const eyeActive = eyeAvailable && isExhibition && desktop && eyeRequested;
   const stageRef = useRef<HTMLElement>(null);
+  const stageResizeObserverRef = useRef<ResizeObserver | null>(null);
   const eyeButtonRef = useRef<HTMLButtonElement>(null);
   const reduceMotion = useReducedMotion();
   const viewRef = useRef<HTMLDivElement>(null);
@@ -220,7 +241,23 @@ export default function Esgrima() {
   const [{ gridPhotos }, setMaskSelection] = useState(() => getNextMaskSelection());
   const [playing, setPlaying] = useState(false);
   const [trackingReady, setTrackingReady] = useState(false);
+  const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
+  const [primaryAspectRatio, setPrimaryAspectRatio] = useState<number>();
   const isPlaying = isExhibition && playing;
+
+  const setStageRef = useCallback((stage: HTMLElement | null) => {
+    stageResizeObserverRef.current?.disconnect();
+    stageResizeObserverRef.current = null;
+    stageRef.current = stage;
+    if (!stage) return;
+
+    const update = () => setStageSize({ width: stage.clientWidth, height: stage.clientHeight });
+    stageResizeObserverRef.current = new ResizeObserver(update);
+    stageResizeObserverRef.current.observe(stage);
+    update();
+  }, []);
+
+  useEffect(() => () => stageResizeObserverRef.current?.disconnect(), []);
 
   useEffect(() => {
     if (!isExhibition) setPlaying(false);
@@ -300,6 +337,12 @@ export default function Esgrima() {
     if (info.offset.y < -50) next();
     if (info.offset.y > 50) previous();
   };
+
+  const maskGridWidth = window.innerHeight * 0.667 - 69.4;
+  const primaryAvailableWidth = stageSize.width - maskGridWidth - 96;
+  const primaryWidth = desktop && primaryAspectRatio && primaryAvailableWidth > 0
+    ? Math.min(stageSize.height * primaryAspectRatio, primaryAvailableWidth) : undefined;
+  const primaryHeight = primaryWidth && primaryAspectRatio ? primaryWidth / primaryAspectRatio : undefined;
 
   return (
     <main className="esgrima-shell">
@@ -437,7 +480,7 @@ export default function Esgrima() {
                 </button>
               </header>
 
-                <section ref={stageRef} className={`esgrima__stage${eyeActive ? ' esgrima__stage--eye' : ''}`} aria-label="Galería de esgrima">
+                <section ref={setStageRef} className={`esgrima__stage${eyeActive ? ' esgrima__stage--eye' : ''}`} aria-label="Galería de esgrima">
                   <div className="esgrima__mask-grid" aria-hidden="true">
                     {(eyeActive ? gridPhotos.slice(0, 2) : gridPhotos).map((src, slot) => (
                       <div key={slot} className="esgrima__mask-photo">
@@ -445,12 +488,16 @@ export default function Esgrima() {
                       </div>
                     ))}
                   </div>
-                  <div className="esgrima__primary-photo">
+                  <div
+                    className="esgrima__primary-photo"
+                    style={!eyeActive && primaryWidth && primaryHeight ? { width: primaryWidth, height: primaryHeight } : undefined}
+                  >
                     <CrossfadeImage
                       className="esgrima__primary-image"
                       src={photos[index]}
                       alt={`Fotografía de esgrima ${index + 1}`}
                       reduceMotion={reduceMotion}
+                      onAspectRatio={setPrimaryAspectRatio}
                       onClick={next}
                       onPanEnd={handlePanEnd}
                     />

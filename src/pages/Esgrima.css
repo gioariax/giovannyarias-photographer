@@ -400,18 +400,9 @@
 
 .esgrima__primary-image {
   position: relative;
-  display: grid;
-  grid-area: 1 / 1;
   width: 100%;
   height: 100%;
   cursor: pointer;
-}
-
-.esgrima__image-sizer {
-  grid-area: 1 / 1;
-  width: 100%;
-  height: 100%;
-  visibility: hidden;
 }
 
 .esgrima__image-layer {
@@ -546,9 +537,8 @@
   }
 
   .esgrima__primary-photo {
-    display: grid;
     flex: 0 1 auto;
-    width: auto;
+    width: calc(100vw - (66.7vh - 69.4px) - 96px);
     height: 100%;
     max-width: calc(100vw - (66.7vh - 69.4px) - 96px);
     place-items: center;
@@ -581,24 +571,16 @@
   .esgrima__mask-image {
     position: absolute;
     inset: 0;
-    display: grid;
     width: 100%;
     height: 100%;
     pointer-events: none;
   }
 
   .esgrima__primary-image {
-    width: auto;
+    width: 100%;
     max-width: 100%;
     height: 100%;
     object-position: center;
-  }
-
-  .esgrima__primary-image .esgrima__image-sizer {
-    width: auto;
-    max-width: 100%;
-    height: 100%;
-    object-fit: contain;
   }
 
   .esgrima__stage--eye {
@@ -609,6 +591,7 @@
   .esgrima__stage--eye .esgrima__mask-grid {
     position: absolute;
     inset: 0 24px;
+    z-index: 0;
     width: auto;
     height: 100%;
     grid-template-rows: minmax(0, 1fr);
@@ -624,11 +607,12 @@
   .esgrima__stage--eye[data-calibrating] .esgrima__mask-photo { opacity: 0.85; }
 
   .esgrima__stage--eye .esgrima__primary-photo {
+    display: block;
     flex: 0 0 calc((100% - 48px) / 3);
     width: calc((100% - 48px) / 3);
     max-width: none;
     height: 100%;
-    justify-content: center;
+    z-index: 1;
   }
 
   .esgrima__stage--eye .esgrima__primary-image {
