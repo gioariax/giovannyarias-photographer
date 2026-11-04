@@ -224,14 +224,13 @@ export default function Esgrima() {
   const { hash, search } = useLocation();
   const isExhibition = hash === '#exposicion';
   const params = new URLSearchParams(search);
-  const eyeAvailable = params.get('eye') === 'true';
   const timeSeconds = Number(params.get('time'));
   // Browser timers overflow above a signed 32-bit millisecond delay.
   const intervalMs = Number.isFinite(timeSeconds) && timeSeconds > 0 && timeSeconds <= 2147483647 / 1000
     ? Math.max(1, Math.round(timeSeconds * 1000)) : 10000;
   const [eyeRequested, setEyeRequested] = useState(false);
   const [desktop, setDesktop] = useState(() => window.matchMedia('(min-width: 1024px)').matches);
-  const eyeActive = eyeAvailable && isExhibition && desktop && eyeRequested;
+  const eyeActive = isExhibition && desktop && eyeRequested;
   const stageRef = useRef<HTMLElement>(null);
   const stageResizeObserverRef = useRef<ResizeObserver | null>(null);
   const eyeButtonRef = useRef<HTMLButtonElement>(null);
@@ -278,7 +277,7 @@ export default function Esgrima() {
     eyeButtonRef.current?.focus();
   };
 
-  useEffect(() => { setEyeRequested(false); }, [isExhibition, eyeAvailable]);
+  useEffect(() => { setEyeRequested(false); }, [isExhibition]);
 
   useEffect(() => {
     const media = window.matchMedia('(min-width: 1024px)');
@@ -455,7 +454,7 @@ export default function Esgrima() {
                 <Link className="esgrima__back" to={{ search, hash: '#presentacion' }}>
                   ← <span>Proyecto y créditos</span>
                 </Link>
-                {eyeAvailable && desktop && (
+                {desktop && (
                   <button
                     ref={eyeButtonRef}
                     type="button"
