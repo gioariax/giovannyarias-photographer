@@ -80,10 +80,16 @@ function ProjectCredits() {
         </div>
         <div>
           <dt>Revelado fotográfico</dt>
+          <dd>
+            <a href={photographerLinks['Ángela Cuesta']} target="_blank" rel="noopener noreferrer">Ángela Cuesta</a>
+          </dd>
           <dd><Link to="/">Giovanny Arias</Link></dd>
         </div>
         <div>
           <dt>Edición gráfica</dt>
+          <dd>
+            <a href={photographerLinks['Ángela Cuesta']} target="_blank" rel="noopener noreferrer">Ángela Cuesta</a>
+          </dd>
           <dd><Link to="/">Giovanny Arias</Link></dd>
         </div>
         <div>
