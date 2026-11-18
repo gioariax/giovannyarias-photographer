@@ -1,4 +1,8 @@
 {
+  "proxy": {
+    "entrypoint": "proxy.js",
+    "matcher": ["/esgrima/:path*", "/esgrima.html"]
+  },
   "rewrites": [
     {
       "source": "/esgrima",

@@ -137,3 +137,16 @@ export default tseslint.config([
   },
 ])
 ```
+# Acceso privado a esgrima
+
+En Vercel, `/esgrima`, `/esgrima.html` y los archivos bajo `/esgrima/`
+requieren una contraseña con el formato `aurablanca@DDYY`, usando el día y
+los dos últimos dígitos del año en la zona horaria de Madrid. Por ejemplo,
+el 5 de marzo de 2026 sería `aurablanca@0526`. La contraseña se repite el
+mismo día de cada mes; el acceso concedido caduca al cambiar de fecha.
+
+Para cambiar la palabra base, configura `ESGRIMA_PASSWORD_PREFIX` como
+variable de entorno en Vercel y vuelve a desplegar. La protección también se
+ejecuta con `vite` y `vite preview`. Esta contraseña compartida y
+predecible no sustituye un sistema de cuentas ni protección contra intentos
+automatizados.

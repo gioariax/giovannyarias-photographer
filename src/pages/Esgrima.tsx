@@ -5,21 +5,21 @@ import { Eye, Play, Square } from 'lucide-react';
 import EsgrimaEyeTracking from './EsgrimaEyeTracking';
 import './Esgrima.css';
 
-const photos = Object.values(
+const photos = Object.keys(
   import.meta.glob<string>('/public/esgrima/photos/*.{jpg,jpeg,png,webp,avif,JPG,JPEG,PNG,WEBP,AVIF}', {
     eager: true,
     query: '?url',
     import: 'default',
   }),
-).sort();
+).map((path) => path.replace('/public/', '/')).sort();
 
-const maskPhotos = Object.values(
+const maskPhotos = Object.keys(
   import.meta.glob<string>('/public/esgrima/photos/mask/*.{jpg,jpeg,png,webp,avif,JPG,JPEG,PNG,WEBP,AVIF}', {
     eager: true,
     query: '?url',
     import: 'default',
   }),
-).sort();
+).map((path) => path.replace('/public/', '/')).sort();
 
 const photographers = [
   'Ángela Cuesta',
